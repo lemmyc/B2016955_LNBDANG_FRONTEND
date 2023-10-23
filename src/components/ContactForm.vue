@@ -9,7 +9,8 @@ export default {
     },
     emits: ["submit:contact", "delete:contact"],
     props: {
-        contact: { type: Object, required: true }
+        contact: { type: Object, required: true },
+        action: String
     },
     data() {
         const contactFormSchema = yup.object().shape({
@@ -36,12 +37,15 @@ export default {
         };
     },
     methods: {
-        submitContact() {
-            this.$emit("submit:contact", this.contactLocal);
+        submitContact(values, {resetForm}) {
+            this.$emit("submit:contact", this.contactLocal, resetForm);
         },
         deleteContact() {
             this.$emit("delete:contact", this.contactLocal.id);
         },
+        returnToHomePage(){
+            this.$router.push({ name: "contactbook" });
+        }
     },
 };
 </script>
@@ -78,6 +82,9 @@ export default {
             <button class="btn btn-primary">Lưu</button>
             <button v-if="contactLocal._id" type="button" class="ml-2 btn btn-danger" @click="deleteContact">
                 Xóa
+            </button>
+            <button type="button" class="ml-2 btn btn-secondary" @click="returnToHomePage">
+                Trở về màn hình chính
             </button>
         </div>
     </Form>

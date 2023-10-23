@@ -12,16 +12,29 @@ export default {
         };
     },
     methods: {
-        async addContact(data) {
-            
+        async addContact(data, resetForm) {
             try {
-                console.log(data)
                 await ContactService.create(data);
-                this.message = "Liên hệ được thêm thành công.";
+                this.message = `Liên hệ ${this.contact.name} được thêm thành công.`;
+                this.$swal({
+                    title: "Liên hệ được thêm thành công",
+                    text: this.message,
+                    icon: "success",
+                    showCancelButton: true,
+                    confirmButtonText: 'Tiếp tục thêm một liên lạc khác',
+                    cancelButtonText: 'Trở về màn hình chính',
+                }).then((result) => {
+                    if (result.value) {
+                        resetForm();
+                    } else {
+                        this.$router.push({ name: "contactbook" });
+                    }
+                })
+
             } catch (error) {
                 console.log(error);
             }
-        }
+        },
     },
     created() {
         this.contact = {
@@ -39,7 +52,6 @@ export default {
 <template>
     <div class="page">
         <h4>Thêm Liên hệ</h4>
-        <ContactForm :contact="contact" @submit:contact="addContact"/>
-        <p>{{ message }}</p>
+        <ContactForm :contact="contact" @submit:contact="addContact" :action="'add'"/>
     </div>
 </template>

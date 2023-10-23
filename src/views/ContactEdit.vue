@@ -32,21 +32,43 @@ export default {
         },
         async updateContact(data) {
             try {
-                console.log(data)
                 await ContactService.update(this.contact._id, data);
-                this.message = "Liên hệ được cập nhật thành công.";
+                this.message = `Liên hệ ${this.contact.name} được cập nhật thành công.`;
+                this.$swal({
+                    title: "Liên hệ được cập nhật thành công",
+                    width: "36em",
+                    text: this.message,
+                    icon: "success",
+                    confirmButtonText: 'Trở về màn hình chính',
+                }).then((result) => {
+                    if (result.value) {
+                        this.$router.push({ name: "contactbook" });
+                    }
+                })
             } catch (error) {
                 console.log(error);
             }
         },
         async deleteContact() {
-            if (confirm("Bạn muốn xóa Liên hệ này?")) {
-                try {
-                    await ContactService.delete(this.contact._id);
-                    this.$router.push({ name: "contactbook" });
-                } catch (error) {
-                    console.log(error);
-                }
+            try {
+                this.message = `Bạn có chắc chắn XÓA liên hệ này?`;
+                this.$swal({
+                    title: "Bạn có chắc chắn XÓA liên hệ này?",
+                    text: "Lưu ý: Hành động này không thể khôi phục !",
+                    icon: "warning",
+                    width: "36em",
+                    showCancelButton: true,
+                    confirmButtonText: 'Đúng, hãy xóa nó.',
+                    cancelButtonText: 'Không xóa',
+                }).then((result) => {
+                    if (result.value) {
+                        ContactService.delete(this.contact._id);
+                        this.$swal('Đã xóa thành công', `Liên hệ ${this.contact.name} đã được xóa thành công`, 'success')
+                        this.$router.push({ name: "contactbook" });
+                    }
+                })
+            } catch (error) {
+                console.log(error);
             }
         },
     },
@@ -61,6 +83,5 @@ export default {
     <div v-if="contact" class="page">
         <h4>Hiệu chỉnh Liên hệ</h4>
         <ContactForm :contact="contact" @submit:contact="updateContact" @delete:contact="deleteContact" />
-        <p>{{ message }}</p>
     </div>
 </template>

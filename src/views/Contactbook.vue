@@ -12,13 +12,13 @@
             <ContactList v-if="filteredContactsCount > 0" :contacts="filteredContacts" v-model:activeIndex="activeIndex" />
             <p v-else>Không có liên hệ nào.</p>
             <div class="mt-3 row justify-content-around align-items-center">
-                <button class="btn btn-sm btn-primary" @click="refreshList()">
+                <button class="btn btn-primary" @click="refreshList()">
                     <i class="fas fa-redo"></i> Làm mới
                 </button>
-                <button class="btn btn-sm btn-success" @click="goToAddContact">
+                <button class="btn btn-success" @click="goToAddContact">
                     <i class="fas fa-plus"></i> Thêm mới
                 </button>
-                <button class="btn btn-sm btn-danger" @click="removeAllContacts">
+                <button class="btn btn-danger" @click="removeAllContacts">
                     <i class="fas fa-trash"></i> Xóa tất cả
                 </button>
             </div>
@@ -34,8 +34,8 @@
                     name: 'contact.edit',
                     params: { id: activeContact._id },
                 }">
-                    <span class="mt-2 badge badge-warning">
-                        <i class="fas fa-edit"></i> Hiệu chỉnh</span>
+                    <button class="mt-2 btn btn-warning">
+                        <i class="fas fa-edit"></i> Hiệu chỉnh</button>
                 </router-link>
             </div>
         </div>
@@ -99,13 +99,25 @@ export default {
             this.activeIndex = -1;
         },
         async removeAllContacts() {
-            if (confirm("Bạn muốn xóa tất cả Liên hệ?")) {
-                try {
-                    await ContactService.deleteAll();
-                    this.refreshList();
-                } catch (error) {
-                    console.log(error);
-                }
+
+            try {
+                this.$swal({
+                    title: "Bạn muốn xóa tất cả Liên hệ?",
+                    text: "Lưu ý: Hành động này không thể khôi phục !",
+                    icon: "warning",
+                    width: "36em",
+                    showCancelButton: true,
+                    confirmButtonText: 'Đúng, hãy xóa tất cả liên hệ.',
+                    cancelButtonText: 'Không xóa',
+                }).then((result) => {
+                    if (result.value) {
+                        ContactService.deleteAll();
+                        this.$swal('Đã xóa thành công', `Tất cả liên hệ đã được xóa thành công`, 'success')
+                        this.refreshList();
+                    }
+                })
+            } catch (error) {
+                console.log(error);
             }
         },
         goToAddContact() {
